@@ -1,0 +1,10 @@
+@isTest(SeeAllData=true)
+public class ExampleDocusignTabsSettingsClassTest {
+    @isTest
+    static void doCreateExampleDocusignTabsSettings() {
+        ExampleDocusignTabsSettingsClass docusignTabsSettings = new ExampleDocusignTabsSettingsClass();
+        System.AssertNotEquals(Null, docusignTabsSettings.getTabs());
+        System.AssertNotEquals(Null, docusignTabsSettings.getEmailSubject());
+        System.AssertNotEquals(Null, docusignTabsSettings.getEmailBody());
+    }
+}

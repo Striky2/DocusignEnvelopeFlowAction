@@ -1,0 +1,171 @@
+public without sharing class  ExampleDocusignTabsSettingsClass implements DocusignTabsDetailsInterface {
+    public String getEmailSubject(){
+        return 'My Sample E-mail Subject';
+    }
+    
+    public String getEmailBody() {
+        return 'My Sample E-mail Body';
+    }
+    
+    public List<dfsle.Tab> getTabs() {
+        List<dfsle.Tab> tabs = new List<dfsle.Tab>();
+        
+        /******   MODIFY THIS MAP WITH YOUR OWN DOCUSIGN TABS            ******/
+        /******   UUIDS ARE FOUND DIRECTLY IN DOCUSIGN URL               ******/
+        /******   MAP KEYS MUST BE MATCHING THE NAMES OF DS FIELD NAMES  ******/
+        /******   DOCUMENT ANCHORS MUST BE EXACTLY \key_name\            ******/
+        Map<string, Map<string, string>> anchorsToBeCreated = new Map<string, Map<string, string>> {
+            'docusign_field_1' => new Map<string, string> {
+                'required' => 'true',//or false 
+                'UUID' => '' //docusign field UUID (if sync with Salesforce expected)
+                'type' => 'text' //only text and checkbox are supported here
+            },
+            'docusign_field_2' => new Map<string, string> {
+                'required' => 'false',//or false 
+                'UUID' => '' //docusign field UUID (if sync with Salesforce expected)
+                'type' => 'checkbox' //only text and checkbox are supported here
+            }
+            // ...
+        };
+
+        for (String name_key : anchorsToBeCreated.keyset()) {
+            dfsle.Tab currentTab;
+            switch on anchorsToBeCreated.get(name_key).get('type') {                
+              	when 'text' {
+                    currentTab = new dfsle.TextTab()
+                    	.withRequired(anchorsToBeCreated.get(name_key).get('required') == 'true'); // Signer must enter value
+                }
+                when 'checkbox' {
+                    currentTab = new dfsle.CheckboxTab();
+                }	
+                when else {
+                	currentTab = new dfsle.TextTab()
+                    	.withRequired(anchorsToBeCreated.get(name_key).get('required') == 'true'); // Signer must enter value
+                }
+            }
+            currentTab
+                .withAnchor(
+                    new dfsle.Tab.Anchor('\\' + name_key + '\\')
+                )
+                .withDataLabel(name_key)
+                .withName(name_key);
+            
+            if (anchorsToBeCreated.get(name_key).get('UUID') != null) {
+                currentTab.withCustomTabID(dfsle.UUID.parse(anchorsToBeCreated.get(name_key).get('UUID')));
+            }
+            
+            tabs.add(currentTab);
+        }
+        
+        /*
+        example of validation : .withValidation(new dfsle.Tab.Validation(
+                20, // Up to 20 characters
+                '^\\w+$', // Match single word
+                'Invalid input'
+            )
+        )*/
+        
+        // ------- Recipient, Sign Here & Date Tabs. --------
+    	tabs.add(
+            new dfsle.EmailAddressTab()
+            .withAnchor(
+                new dfsle.Tab.Anchor(
+                    '\\sa1.email\\', // Anchor string
+                    false, // Do not allow white space in anchor string
+                    false, // Anchor string is not case sensitive
+                    'right', // Horizontal alignment in relation to the anchor text
+                    true, // Ignore if the anchor text is not present in the document
+                    true, // Must match the value of the anchor string in its entirety
+                    'pixels', // Unit of the x and y offset properties
+                    0, // X offset
+                    0
+                )
+            )
+        );
+        
+        tabs.add(
+            new dfsle.FirstNameTab()
+            .withAnchor(
+                new dfsle.Tab.Anchor(
+                    '\\sa1.firstname\\', // Anchor string
+                    false, // Do not allow white space in anchor string
+                    false, // Anchor string is not case sensitive
+                    'right', // Horizontal alignment in relation to the anchor text
+                    true, // Ignore if the anchor text is not present in the document
+                    true, // Must match the value of the anchor string in its entirety
+                    'pixels', // Unit of the x and y offset properties
+                    0, // X offset
+                    0
+                )
+            )
+        );
+        
+        tabs.add(
+            new dfsle.LastNameTab()
+            .withAnchor(
+                new dfsle.Tab.Anchor(
+                    '\\sa1.lastname\\', // Anchor string
+                    false, // Do not allow white space in anchor string
+                    false, // Anchor string is not case sensitive
+                    'right', // Horizontal alignment in relation to the anchor text
+                    true, // Ignore if the anchor text is not present in the document
+                    true, // Must match the value of the anchor string in its entirety
+                    'pixels', // Unit of the x and y offset properties
+                    0, // X offset
+                    0
+                )
+            )
+        );
+        
+        tabs.add(
+            new dfsle.SignHereTab()
+            .withScale(1) // 1/2 scale
+            .withRequired(true) // Signing mandatory
+            .withAnchor(
+                new dfsle.Tab.Anchor(
+                    '\\sa1.signature\\', // Anchor string
+                    false, // Do not allow white space in anchor string
+                    false, // Anchor string is not case sensitive
+                    'right', // Horizontal alignment in relation to the anchor text
+                    true, // Ignore if the anchor text is not present in the document
+                    true, // Must match the value of the anchor string in its entirety
+                    'pixels', // Unit of the x and y offset properties
+                    0, // X offset
+                    0
+                )
+            )
+        );
+        
+        // Create a Date Signed tab
+    	tabs.add(new dfsle.DateSignedTab()
+            .withFormatting(
+                new dfsle.Tab.Formatting(
+                    'Helvetica', // Font
+                    'default', // Font color
+                    14, // 14pt size,
+                    true, // Bold
+                    false, // Italic
+                    false, // Underline
+                    false, // Conceal value
+                    false
+                )
+            ) // Fixed width
+             // Y offset
+            .withAnchor(
+                new dfsle.Tab.Anchor(
+                    '\\sa1.signatureDate\\', // Anchor string
+                    false, // Do not allow white space in anchor string
+                    false, // Anchor string is not case sensitive
+                    'right', // Horizontal alignment in relation to the anchor text
+                    true, // Ignore if the anchor text is not present in the document
+                    true, // Must match the value of the anchor string in its entirety
+                    'pixels', // Unit of the x and y offset properties
+                    0, // X offset
+                    0
+                )
+             )
+        );
+        
+        return tabs;
+    }
+}

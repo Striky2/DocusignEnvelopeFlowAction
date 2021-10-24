@@ -1,0 +1,127 @@
+global without sharing class AddContentsToDocusignEnvelopeAndSend {
+    
+    static List<AddContentsToDocusignEnvelopeRequest> requests = new List<AddContentsToDocusignEnvelopeRequest>();
+    static List<dfsle.Envelope> myEnvelopes;
+    static List<dfsle.Envelope.Status> envelopeStatus;
+    
+    @InvocableMethod(label='Add multiple ContentVersions do Docusign envelope and Send')
+    global static List<AddContentsToDocusignEnvelopeResult> doAddContentAndSendMultiple(List <AddContentsToDocusignEnvelopeRequest> requests) {  
+        List<AddContentsToDocusignEnvelopeResult> results = new List<AddContentsToDocusignEnvelopeResult>();
+        Integer i = 0;
+        for(AddContentsToDocusignEnvelopeRequest request : requests){
+            results.add(doAddContentAndSend(request));
+            i++;
+        }
+        return results; 
+    }
+                        
+    global static AddContentsToDocusignEnvelopeResult doAddContentAndSend(AddContentsToDocusignEnvelopeRequest request, Integer i) {
+        AddContentsToDocusignEnvelopeAndSend.requests.add(request);
+        AddContentsToDocusignEnvelopeResult result = new AddContentsToDocusignEnvelopeResult();
+        dfsle.Entity entity = new dfsle.Entity(requests[i].objectSourceId);
+        dfsle.Envelope myEnvelope = dfsle.EnvelopeService.getEmptyEnvelope(entity);
+		
+        /*  
+         *  Mode 1 : "document fromTemplate" / future Feature scope
+         *  works fine with a static PDF document loaded in the template
+         *  doesn't work if no static PDF document loaded in the Docusign template
+         */ 
+
+        /*
+        if (request.forceDocusignEvenloppeTemplate) {}
+            dfsle.Document myDocument = dfsle.Document.fromTemplate(
+                dfsle.UUID.parse(request.docusignEnveloppeTemplateUUID), // The templateId in dfsle.UUID format
+                request.docusignEnveloppeTemplateName //// The templateId in dfsle.UUID format
+            );
+            
+            myEnvelope = myEnvelope.withDocuments(
+                new List<dfsle.Document> { myDocument }
+            );
+		}
+        */
+        
+        /*  
+         *  Mode 2 : "document dynamically loaded / no template"
+         else {
+         */ 
+
+        List <dfsle.Document> documents = dfsle.DocumentService.getDocuments(
+            ContentVersion.getSObjectType(), 
+            new Set<Id>(request.contentVersionIds)
+        );
+
+        DocusignTabsDetailsInterface tabDetails = 
+            DocusignTabsDetailsFactory.build(request.docusignTabsClassname);
+        
+        List<dfsle.Tab> myTabs = tabDetails.getTabs();
+        
+        myEnvelope = myEnvelope
+            .withDocuments(documents)
+            .withEmail(
+                tabDetails.getEmailSubject(), 
+                tabDetails.getEmailBody()
+            );
+
+        //}
+
+        dfsle.Recipient myRecipient = dfsle.Recipient.fromSource(
+            request.mainContact.firstName + ' ' + request.mainContact.lastName, // Signer name
+            request.mainContact.email, // Signer email
+            request.mainContact.phone, // Signer phone number
+            request.mainContactRole, // Signer role
+            new dfsle.Entity(request.mainContact.Id)
+        ) // Salesforce contact association
+        .withTabs(myTabs);
+
+		// Add recipient to the envelope
+		myEnvelope = myEnvelope.withRecipients(new List<dfsle.Recipient> { myRecipient });
+
+        //ASYNC CALL
+        System.enqueueJob(new SendDocusignEnvelope(myEnvelope));
+
+        return result;
+    }
+    global static AddContentsToDocusignEnvelopeResult doAddContentAndSend(AddContentsToDocusignEnvelopeRequest request) {
+        return doAddContentAndSend(request,0);
+    }
+    
+	global class AddContentsToDocusignEnvelopeRequest {        
+        @InvocableVariable(required=true label='Docusign tabs detail APEX classname.')
+        global String docusignTabsClassname;
+        
+        @InvocableVariable(required=true label='Salesfoce Object ID from which the envelope is created.')
+        global ID objectSourceId;
+        
+        @InvocableVariable(required=true label='Set of ContentVersion IDs to be attached.')
+        global List<Id> contentVersionIds;
+        
+        @InvocableVariable(required=true label='Main contact used as signatory authority.')
+        global Contact mainContact;
+        
+        @InvocableVariable(required=true label='Docusign signatory authority role name.')
+        global String mainContactRole;
+        
+        /* future Feature scope
+
+        @InvocableVariable(required=true label='Force Docusign Enveloppe Template to be used [default: false]')
+        global Boolean forceDocusignEvenloppeTemplate = false;
+
+        @InvocableVariable(required=false label='Docusign Enveloppe Template UUID')
+        global String docusignEnveloppeTemplateUUID;
+
+        @InvocableVariable(required=false label='Docusign Enveloppe Template UUID')
+        global String docusignEnveloppeTemplateName;
+
+        @InvocableVariable(required=false label='Set of Contacts IDs to be CCed.')
+        global List<Id> ccContacts;
+        
+        @InvocableVariable(required=false label='Docusign signatory CC authority role name.')
+        global String ccContactsRole;
+        */
+    }
+    
+    global class AddContentsToDocusignEnvelopeResult {
+        @InvocableVariable(label='Sent envelope status')
+        global dfsle.Envelope.Status envelopeStatus;
+    }
+}

@@ -1,0 +1,5 @@
+public interface DocusignTabsDetailsInterface {
+    List<dfsle.Tab> getTabs();
+    String getEmailSubject();
+    String getEmailBody();
+}

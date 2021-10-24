@@ -1,0 +1,26 @@
+@isTest(SeeAllData=true)
+public class DocusignTabsDetailsFactoryTest {
+	@isTest
+    static void doFactoryTest() {
+        DocusignTabsDetailsInterface exampleDocusignTabsSettingsClass = DocusignTabsDetailsFactory.build('ExampleDocusignTabsSettingsClass');
+        exampleDocusignTabsSettingsClass = (ExampleDocusignTabsSettingsClass)exampleDocusignTabsSettingsClass;
+        System.assert(exampleDocusignTabsSettingsClass instanceOf ExampleDocusignTabsSettingsClass);
+        System.assertNotEquals(
+            null,
+            exampleDocusignTabsSettingsClass,
+            'Class constructor should not have rendered back a null class instance.'
+        );
+
+        /***** ADD YOUR OWN NEW DOCUSIGN TABS CLASSES TESTS HERE ******/
+        /*
+        DocusignTabsDetailsInterface myOtherDocusignTabsSettingsClass = DocusignTabsDetailsFactory.build('MyOhterDocusignTabsSettingsClass');
+        myOtherDocusignTabsSettingsClass = (MyOtherDocusignTabsSettingsClass)myOtherDocusignTabsSettingsClass;
+        System.assert(myOtherDocusignTabsSettingsClass instanceOf MyOtherDocusignTabsSettingsClass);
+        System.assertNotEquals(
+            null,
+            myOtherDocusignTabsSettingsClass,
+            'Class constructor should not have rendered back a null class instance.'
+        );
+        */
+    }
+}

@@ -1,0 +1,73 @@
+<apex:page standardController="Account"
+   renderAs="pdf" showHeader="false" sidebar="false"
+   standardStylesheets="false" applyBodyTag="false" applyHtmlTag="false">
+<head>
+<style type="text/css">
+@page{
+     margin:0.3in;
+    @bottom-center {
+        content: element(footer);
+    }
+}
+.ds-line {
+    line-height: 150%;
+    vertical-align: middle;
+}
+.ds-anchor {
+    color:#FFFFFF;
+    text-decoration: #000000 underline;
+}
+body {
+    font-family:sans-serif;
+    text-align:left;
+    color:#051c59;
+    margin-left:20px;
+    margin-right:20px;
+}
+.signature{
+    margin-right:20px;
+    text-align:right;
+}
+.signature p{
+    font-size:16px;
+    line-height:20px;
+}
+p {
+    font-size:13px;
+    line-height:14px;
+}
+.left {
+    text-align:left;
+}        
+
+</style>
+</head>
+
+<body> 
+<div style="page-break-after:always;"> 
+
+<p class="ds-line">Example 1 :&nbsp;<span class="ds-anchor">\docusign_field_1\</span> </p>
+<p class="ds-line">Example 2 :&nbsp;<span class="ds-anchor">\docusign_field_2\</span> </p>
+
+<table style="width:100%;">
+<tr>
+<td style="width:50%;vertical-align:top;"><b>For the Client,</b><br/> 
+<p class="ds-line">Lastname: <span class="ds-anchor">\sa1.lastname\</span></p> 
+<p class="ds-line">Firstname: <span class="ds-anchor">\sa1.firstname\</span></p>
+<p class="ds-line">Title: <span class="ds-anchor">\sa1.title\</span></p>
+<br/>
+<p class="ds-line">Signature: <span class="ds-anchor">\sa1.signature\</span></p><br/>
+<p class="ds-line">Signature date: <span class="ds-anchor">\sa1.signatureDate\</span></p>
+</td>
+
+<td class="signature"><b>For the Company,</b><br/> 
+<p>Signed by ....
+<br/>
+Title ....</p>
+</td>
+</tr>
+</table>
+
+</div>
+</body>
+</apex:page>

@@ -1,0 +1,40 @@
+@isTest(SeeAllData=true)
+public class AddContentsToDocusignEnvelopeAndSendTest {
+	@isTest 
+    public static void doAddContentAndSendTest() {
+        
+        AddContentsToDocusignEnvelopeAndSend.AddContentsToDocusignEnvelopeRequest request = 
+            new AddContentsToDocusignEnvelopeAndSend.AddContentsToDocusignEnvelopeRequest();
+        AddContentsToDocusignEnvelopeAndSend.AddContentsToDocusignEnvelopeResult result = 
+            new AddContentsToDocusignEnvelopeAndSend.AddContentsToDocusignEnvelopeResult();
+        
+        Contact contact = new Contact();
+        contact.lastName = 'ContactlastnameTest';
+        contact.firstName = 'ContactfirstnameTest';
+        datetime myDateTimeNow = datetime.now();
+        contact.email = 'contactfirstnametest.contactlastnametest+' + myDateTimeNow.second() + '@test.com';
+        insert contact;
+        
+        request.docusignTabsClassname = 'ExampleDocusignTabsSettingsClass';
+        
+        //creating sample object as source for Docusign Example Template
+        Account account = new Account(Name:'TestAccount');
+        insert account;
+        request.objectSourceId = account.Id;
+        
+        request.mainContact = contact;
+        request.mainContactRole = 'Sample Docusign Contact Role';
+        
+        ContentVersion conVer = new ContentVersion();
+        conVer.ContentLocation = 'S'; // to use S specify this document is in Salesforce, to use E for external files
+        conVer.PathOnClient =  'test_docusign_with_pdf.pdf'; // The files name, extension is very important here which will help the file in preview
+        conVer.Title = 'Test docusign with PDF'; // Display name of the files
+        conVer.VersionData = Blob.valueOf('TEST PDF file');
+        insert conVer;
+        request.contentVersionIds = new List<ID>{conVer.Id};
+        
+        result = AddContentsToDocusignEnvelopeAndSend.doAddContentAndSend(request); 
+        
+        System.assertEquals(null,result.envelopeStatus);
+    }
+}

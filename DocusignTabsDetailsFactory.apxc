@@ -1,0 +1,35 @@
+public class DocusignTabsDetailsFactory {
+    
+    public String className;
+    
+    private static DocusignTabsDetailsInterface docusignTabsDetails = null;
+    
+    public DocusignTabsDetailsFactory(String className) {
+        this.className = className;
+        switch on className {
+            when 'ExampleDocusignTabsSettingsClass'{
+                docusignTabsDetails = new ExampleDocusignTabsSettingsClass();
+            }
+            /***** ADD YOUR OWN NEW DOCUSIGN TABS CLASSES HERE ******/
+            /*
+            when 'MyOtherDocusignTabsClass'{
+                myOtherDocusignTabsDetailsClass = new MyOtherDocusignTabsClass();
+            }
+            */
+            when else {
+                throw new UnknownDocusignCustomTabClassException('Requested DocusignTabsDetails Class [' + className + '] is unknown.');
+            }
+        }
+    }
+    
+    public static DocusignTabsDetailsInterface build(String className) {
+        //if unexistant singleton or distinct singleton classname pre-existed, reset singleton
+        if (docusignTabsDetails == null ||  (String.valueOf(docusignTabsDetails).split(':')[0] != className)) {
+            new DocusignTabsDetailsFactory(className);
+        }
+        
+        return docusignTabsDetails;   
+    }
+    
+    public class UnknownDocusignCustomTabClassException extends Exception {}
+}
