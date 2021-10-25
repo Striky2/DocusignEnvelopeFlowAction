@@ -1,0 +1,17 @@
+public without sharing class SendDocusignEnvelope implements Queueable, Database.AllowsCallouts {
+	private dfsle.Envelope envelope;
+    
+    public SendDocusignEnvelope(dfsle.Envelope myEnvelope) {
+        envelope = myEnvelope;
+    }
+    
+    public void execute(QueueableContext context) {
+        try {
+        	this.envelope = dfsle.EnvelopeService.sendEnvelope(this.envelope, true);
+        }
+        catch (Exception e) {
+            System.debug(LoggingLevel.INFO, 'Error: ' + e.getMessage() + ' | Stacktrace: ' + e.getStackTraceString());
+            return ;
+        }
+    }
+}

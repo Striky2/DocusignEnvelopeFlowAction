@@ -1,10 +1,10 @@
 public without sharing class  ExampleDocusignTabsSettingsClass implements DocusignTabsDetailsInterface {
     public String getEmailSubject(){
-        return 'My Sample E-mail Subject';
+        return 'My Sample email Subject';
     }
     
     public String getEmailBody() {
-        return 'My Sample E-mail Body';
+        return 'My Sample email Body';
     }
     
     public List<dfsle.Tab> getTabs() {
@@ -65,6 +65,8 @@ public without sharing class  ExampleDocusignTabsSettingsClass implements Docusi
             )
         )*/
         
+        /********* THE FOLLOWING LINES ALLOW TO INCLUDE 
+        ********** CONTACT AND SIGNATURE DOCUSIGN FIELDS *******/
         // ------- Recipient, Sign Here & Date Tabs. --------
     	tabs.add(
             new dfsle.EmailAddressTab()

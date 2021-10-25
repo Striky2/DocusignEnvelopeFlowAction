@@ -30,8 +30,8 @@ global without sharing class AddContentsToDocusignEnvelopeAndSend {
         /*
         if (request.forceDocusignEvenloppeTemplate) {}
             dfsle.Document myDocument = dfsle.Document.fromTemplate(
-                dfsle.UUID.parse(request.docusignEnveloppeTemplateUUID), // The templateId in dfsle.UUID format
-                request.docusignEnveloppeTemplateName //// The templateId in dfsle.UUID format
+                dfsle.UUID.parse(request.docusignEnvelopeTemplateUUID), // The templateId in dfsle.UUID format
+                request.docusignEnvelopeTemplateName //// The templateId in dfsle.UUID format
             );
             
             myEnvelope = myEnvelope.withDocuments(
@@ -103,14 +103,14 @@ global without sharing class AddContentsToDocusignEnvelopeAndSend {
         
         /* future Feature scope
 
-        @InvocableVariable(required=true label='Force Docusign Enveloppe Template to be used [default: false]')
+        @InvocableVariable(required=true label='Force Docusign Envelope Template to be used [default: false]')
         global Boolean forceDocusignEvenloppeTemplate = false;
 
-        @InvocableVariable(required=false label='Docusign Enveloppe Template UUID')
-        global String docusignEnveloppeTemplateUUID;
+        @InvocableVariable(required=false label='Docusign Envelope Template UUID')
+        global String docusignEnvelopeTemplateUUID;
 
-        @InvocableVariable(required=false label='Docusign Enveloppe Template UUID')
-        global String docusignEnveloppeTemplateName;
+        @InvocableVariable(required=false label='Docusign Envelope Template UUID')
+        global String docusignEnvelopeTemplateName;
 
         @InvocableVariable(required=false label='Set of Contacts IDs to be CCed.')
         global List<Id> ccContacts;
